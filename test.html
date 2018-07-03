@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webworkers Example</title>
+    <script>
+        const worker1 = new Worker('./worker1.js')
+        const worker2 = new Worker('./worker2.js')
+        window.onload = () => {
+            const $search = document.getElementById('search')
+            const $preview = document.getElementById('preview')
+            const previewCtx = $preview.getContext('2d')
+            worker1.addEventListener('message', e => {
+                const image = new Image()
+                image.src = e.data
+                image.crossOrigin = "Anonymous";
+                image.onload = function () {
+                    window.createImageBitmap(image).then((bitmap) => {
+                        $preview.height = bitmap.height
+                        $preview.width = bitmap.width
+                        previewCtx.drawImage(bitmap, 0, 0)
+                        const imageData = previewCtx.getImageData(0, 0, $preview.width, $preview.height)
+                        worker2.postMessage(imageData)
+                    })
+                }
+                console.log('message received', e)
+            })
+
+            worker2.addEventListener('message', e => {
+                console.log('worker2: ', e.data)
+                const imageData = e.data
+                previewCtx.putImageData(imageData, 0, 0)
+            })
+
+            $search.onchange = (e) => {
+                worker1.postMessage(e.target.value)
+            }
+
+        }
+    </script>
+</head>
+<body>
+<input id="search" style="width:800px"/>
+<canvas id="preview"></canvas>
+</body>
+</html>
