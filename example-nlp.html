@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wix Engineering Conf 2019!</title>
+    <style>
+        input {
+            width: 100%;
+        }
+
+        .nl-Verb {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<input id="search"/>
+<h1 id="result"></h1>
+<script>
+    const worker1 = new Worker('worker1.js')
+    const $search = document.getElementById('search')
+    const result = document.getElementById('result')
+
+    $search.addEventListener('keyup', function() {
+        worker1.postMessage($search.value)
+    })
+
+    worker1.onmessage = e => {
+        if ($search.value === e.data.text) {
+            result.innerHTML = e.data.html
+        }
+    }
+</script>
+</body>
+</html>
