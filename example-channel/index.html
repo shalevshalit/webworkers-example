@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example Channel</title>
+    <style>
+        input {
+            width: 100%;
+        }
+
+        .nl-Verb {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<input id="search"/>
+<h1 id="result"></h1>
+<canvas id="image" height="400" width="800"></canvas>
+<script>
+    const worker1 = new Worker('worker1.js')
+    const worker2 = new Worker('worker2.js')
+    const {port1, port2} = new MessageChannel()
+    const $search = document.getElementById('search')
+    const $result = document.getElementById('result')
+    const $image = document.getElementById('image')
+    const $imageCtx = $image.getContext('2d')
+
+    worker1.postMessage({port: port1}, [port1])
+    worker2.postMessage({port: port2}, [port2])
+
+    $search.addEventListener('keyup', e => {
+        worker1.postMessage($search.value)
+        if(e.keyCode === 13) {
+            worker2.postMessage({})
+        }
+    })
+
+    worker2.onmessage = e => {
+        $imageCtx.putImageData(new ImageData(e.data, 800, 400), 0, 0)
+    }
+    worker1.onmessage = e => {
+        if ($search.value === e.data.text) {
+            $result.innerHTML = e.data.html
+        }
+    }
+</script>
+</body>
+</html>
