@@ -5,6 +5,7 @@ self.onmessage = e => {
 
     self.postMessage({
         text: doc.out('text'),
-        html: doc.out('html')
+        html: doc.out('html'),
+        nouns: doc.nouns().data()
     })
 }

@@ -3,44 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Webworkers Example</title>
-    <script>
-        const worker1 = new Worker('./worker1.js')
-        const worker2 = new Worker('./worker2.js')
-        window.onload = () => {
-            const $search = document.getElementById('search')
-            const $preview = document.getElementById('preview')
-            const previewCtx = $preview.getContext('2d')
-            worker1.addEventListener('message', e => {
-                const image = new Image()
-                image.src = e.data
-                image.crossOrigin = "Anonymous";
-                image.onload = function () {
-                    window.createImageBitmap(image).then((bitmap) => {
-                        $preview.height = bitmap.height
-                        $preview.width = bitmap.width
-                        previewCtx.drawImage(bitmap, 0, 0)
-                        const imageData = previewCtx.getImageData(0, 0, $preview.width, $preview.height)
-                        worker2.postMessage(imageData)
-                    })
-                }
-                console.log('message received', e)
-            })
-
-            worker2.addEventListener('message', e => {
-                console.log('worker2: ', e.data)
-                const imageData = e.data
-                previewCtx.putImageData(imageData, 0, 0)
-            })
-
-            $search.onchange = (e) => {
-                worker1.postMessage(e.target.value)
-            }
-
-        }
-    </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
 <input id="search" style="width:800px"/>
-<canvas id="preview"></canvas>
+<canvas id="preview" height="400" width="800"></canvas>
+<canvas id="preview2" height="400" width="800"></canvas>
+<script>
+    const worker1 = new Worker('./worker1.js')
+    const worker2 = new Worker('./worker2.js')
+    const $search = document.getElementById('search')
+    const $preview = document.getElementById('preview')
+    const $preview2 = document.getElementById('preview2')
+    const previewCtx = $preview.getContext('2d')
+    const previewCtx2 = $preview2.getContext('2d')
+    worker1.addEventListener('message', e => {
+        const image = new Image()
+        image.crossOrigin = 'Anonymous'
+        image.onload = () => {
+            window.createImageBitmap(image).then((bitmap) => {
+                previewCtx.drawImage(bitmap, 0, 0)
+                const imageData = previewCtx.getImageData(0, 0, $preview.width, $preview.height)
+                worker2.postMessage(imageData)
+            })
+        }
+        image.src = e.data
+    })
+
+    worker2.addEventListener('message', e => {
+        const imageData = e.data
+        previewCtx2.putImageData(imageData, 0, 0)
+    })
+
+    $search.onchange = (e) => {
+        worker1.postMessage(e.target.value)
+    }
+
+</script>
 </body>
 </html>
