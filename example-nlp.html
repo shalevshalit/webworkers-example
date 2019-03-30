@@ -19,15 +19,15 @@
 <script>
     const worker1 = new Worker('worker1.js')
     const $search = document.getElementById('search')
-    const result = document.getElementById('result')
+    const $result = document.getElementById('result')
 
-    $search.addEventListener('keyup', function() {
+    $search.addEventListener('keyup', () => {
         worker1.postMessage($search.value)
     })
 
     worker1.onmessage = e => {
         if ($search.value === e.data.text) {
-            result.innerHTML = e.data.html
+            $result.innerHTML = e.data.html
         }
     }
 </script>
