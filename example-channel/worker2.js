@@ -23,7 +23,7 @@ self.onmessage = (e) => {
             if (!type) {
                 return
             }
-            src = `https://source.unsplash.com/800x400/?${type}`
+            const src = `https://source.unsplash.com/800x400/?${type}`
             fetch(src, { mode: 'cors' })
                 .then(response => createImageBitmap(response.blob()))
                 .then(imageBitmap => {
