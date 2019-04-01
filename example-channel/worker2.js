@@ -25,10 +25,10 @@ self.onmessage = (e) => {
             }
             const src = `https://source.unsplash.com/800x400/?${type}`
             fetch(src, { mode: 'cors' })
-                .then(response => createImageBitmap(response.blob()))
+                .then(response => response.blob())
+                .then(blob => createImageBitmap(blob))
                 .then(imageBitmap => {
                     imageCtx.drawImage(imageBitmap, 0, 0)
-                    console.log(imageCtx.getImageData(0, 0, 800, 400))
                     imageData = changeImage(imageCtx.getImageData(0, 0, 800, 400))
             })
         }
